@@ -1,0 +1,3 @@
+([('tutorial',
+   '/Users/evandorsey/PycharmProjects/Python-Platformer-main/dist/tutorial',
+   'EXECUTABLE')],)
