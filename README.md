@@ -1,8 +1,10 @@
 # Python-Platformer
-Put here a short paragraph describing your project. 
-Adding an screenshot or a mockup of your application in action would be nice.  
+Python Platformer is a 2D platformer game that provides a classical, Super-Mario Bros. experience. The theme around this game is that of Temple University and its mascot, Hooter the Owl.  After clicking through the title screen, the user will be able to control a character’s movements as the character advances through a level. Like other Platformer games, there will be various obstacles and enemies scattered across the level that the player must avoid. There will also be a leaderboard presented to users to showcase the fastest or best scores.
 
-![This is a screenshot.](images.png)
+<img width="801" alt="Screenshot 2023-11-10 at 9 46 14 AM" src="https://github.com/cis3296f23/project-03-pythonplatformer/assets/90412421/8e617e21-af45-4c4e-85c5-e7167fa2d6c1">
+<img width="997" alt="Screenshot 2023-11-10 at 9 46 36 AM" src="https://github.com/cis3296f23/project-03-pythonplatformer/assets/90412421/fd3bebbb-aff8-4fd9-bfa6-0c1aaef8179f">
+
+
 # How to run
 - Download the latest binary from the Release section on the right on GitHub.  
 - On the command line uncompress using
@@ -11,7 +13,7 @@ tar -xzf
 ```
 - On the command line run with
 ```
-./hello
+./main
 ```
 - You will see the Platformer window on your terminal and you can begin playing.
 
