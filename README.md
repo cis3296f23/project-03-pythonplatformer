@@ -4,7 +4,6 @@ Adding an screenshot or a mockup of your application in action would be nice.
 
 ![This is a screenshot.](images.png)
 # How to run
-Provide here instructions on how to use your application.   
 - Download the latest binary from the Release section on the right on GitHub.  
 - On the command line uncompress using
 ```
@@ -14,15 +13,16 @@ tar -xzf
 ```
 ./hello
 ```
-- You will see Hello World! on your terminal. 
+- You will see the Platformer window on your terminal and you can begin playing.
 
 # How to contribute
-Follow this project board to know the latest status of the project: [http://...]([http://...])  
+Follow this project board to know the latest status of the project: [(https://github.com/orgs/cis3296f23/projects/121/views/1)]
 
 ### How to build
-- Use this github repository: ... 
-- Specify what branch to use for a more stable release or for cutting edge development.  
-- Use InteliJ 11
-- Specify additional library to download if needed 
-- What file and target to compile and run. 
-- What is expected to happen when the app start. 
+- Use this github repository: https://github.com/cis3296f23/project-03-pythonplatformer
+- Fork a copy of the code or download the zip file.  
+- Use PyCharm or VSCode to open 
+- Check for main.py file as well as other images folders.
+- Open main.py and run the code from the IDE to test the game.
+- Make any necessary changes/improvements
+- Add, commit, and push any modifications.
