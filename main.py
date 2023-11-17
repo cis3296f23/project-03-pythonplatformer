@@ -352,8 +352,9 @@ def main(window):
         draw(window, background, bg_image, player, objects, offset_x)
 
         #if player falls off of the map, the player will respawn at the starting point
-        if player.rect.y > HEIGHT:  # Assuming HEIGHT is the bottom of the screen
+        if player.rect.y > HEIGHT:  
             player.respawn(*respawn_point)
+            
 
         if ((player.rect.right - offset_x >= WIDTH - scroll_area_width) and player.x_vel > 0) or (
                 (player.rect.left - offset_x <= scroll_area_width) and player.x_vel < 0):
