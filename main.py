@@ -300,7 +300,7 @@ def handle_move(player, objects):
 
 def main(window):
     clock = pygame.time.Clock()
-    background, bg_image = get_background("Blue.png")
+    background, bg_image = get_background("cityBackground3.png")
     
 
     block_size = 96
