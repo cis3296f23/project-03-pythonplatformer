@@ -54,6 +54,18 @@ def get_block(size):
     return pygame.transform.scale2x(surface)
 
 
+# class is for infinitelty generating the map
+class Level:
+    def __init__(self):
+        self.platforms = []
+
+    def generate_new_platforms(self, x_start, num_platforms, block_size, height):
+        for i in range(num_platforms):
+            x_position = x_start + i * block_size
+            new_platform = Block(x_position, height - block_size, block_size)
+            self.platforms.append(new_platform)
+
+
 class Player(pygame.sprite.Sprite):
     COLOR = (255, 0, 0)
     GRAVITY = 1
@@ -72,6 +84,14 @@ class Player(pygame.sprite.Sprite):
         self.jump_count = 0
         self.hit = False
         self.hit_count = 0
+
+    #function for player respawn
+    def respawn(self, x, y):
+        self.rect.x = x
+        self.rect.y = y
+        self.y_vel = 0
+        self.x_vel = 0
+        self.jump_count = 0
 
     def jump(self):
         self.y_vel = -self.GRAVITY * 8
@@ -281,6 +301,7 @@ def handle_move(player, objects):
 def main(window):
     clock = pygame.time.Clock()
     background, bg_image = get_background("Blue.png")
+    
 
     block_size = 96
 
@@ -291,6 +312,13 @@ def main(window):
              for i in range(-WIDTH // block_size, (WIDTH * 2) // block_size)]
     objects = [*floor, Block(0, HEIGHT - block_size * 2, block_size),
                Block(block_size * 3, HEIGHT - block_size * 4, block_size), fire]
+
+    # initialize the level class for generating platforms
+    level = Level()
+    level.generate_new_platforms(-WIDTH // block_size, 20, block_size, HEIGHT)
+
+    #sets spawn point for if player falls off the map
+    respawn_point = (100, 100)
 
     offset_x = 0
     scroll_area_width = 200
@@ -303,15 +331,29 @@ def main(window):
             if event.type == pygame.QUIT:
                 run = False
                 break
-
+            
+            #updated to jump with up arrow Or spacebar because using spacebar is weird
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE and player.jump_count < 2:
+                if (event.key == pygame.K_SPACE or event.key == pygame.K_UP) and player.jump_count < 2:
                     player.jump()
 
+        #while in this loop, the platforms will continue to generate as long
+        #as the player continues to head left
+        rightmost_platform = max(level.platforms, key=lambda plat: plat.rect.x)
+        if rightmost_platform.rect.x < WIDTH + offset_x:
+            level.generate_new_platforms(rightmost_platform.rect.x + block_size, 5, block_size, HEIGHT)
+
+
+        objects = level.platforms + [fire]
+        
         player.loop(FPS)
         fire.loop()
         handle_move(player, objects)
         draw(window, background, bg_image, player, objects, offset_x)
+
+        #if player falls off of the map, the player will respawn at the starting point
+        if player.rect.y > HEIGHT:  # Assuming HEIGHT is the bottom of the screen
+            player.respawn(*respawn_point)
 
         if ((player.rect.right - offset_x >= WIDTH - scroll_area_width) and player.x_vel > 0) or (
                 (player.rect.left - offset_x <= scroll_area_width) and player.x_vel < 0):
