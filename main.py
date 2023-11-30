@@ -65,6 +65,13 @@ class Level:
             new_platform = Block(x_position, height - block_size, block_size)
             self.platforms.append(new_platform)
 
+    def generate_spikes(self, x_start, num_spikes, block_size, height):
+        for _ in range(num_spikes):
+            x_position = x_start + random.randint(0, WIDTH - block_size)
+            y_position = height - block_size - random.randint(1, 1) * block_size
+            new_spike = Spike(x_position, y_position, block_size)
+            self.platforms.append(new_spike)
+
 
 class Player(pygame.sprite.Sprite):
     COLOR = (255, 0, 0)
@@ -278,7 +285,7 @@ def collide(player, objects, dx):
     return collided_object
 
 
-def handle_move(player, objects):
+def handle_move(player, objects, respawn_point):
     keys = pygame.key.get_pressed()
 
     player.x_vel = 0
@@ -296,6 +303,27 @@ def handle_move(player, objects):
     for obj in to_check:
         if obj and obj.name == "fire":
             player.make_hit()
+
+    #if the player collides with a spike they are sent to the respawn point
+    for obj in objects:
+        if isinstance(obj, Spike) and pygame.sprite.collide_mask(player, obj):
+            player.make_hit()
+            player.respawn(*respawn_point)
+            break
+
+#the spike class that generates the spikes
+class Spike(Object):
+    def __init__(self, x, y, size):
+        super().__init__(x, y, size, size, "spike")
+        spike_image = self.load_spike_image(size)
+        self.image.blit(spike_image, (0, 0))
+        self.mask = pygame.mask.from_surface(self.image)
+
+    @staticmethod
+    def load_spike_image(size):
+        path = join("assets", "Traps", "Spikes", "Idle.png")  # Update this path as needed
+        image = pygame.image.load(path).convert_alpha()
+        return pygame.transform.scale(image, (size, size))
 
 
 def main(window):
@@ -342,13 +370,14 @@ def main(window):
         rightmost_platform = max(level.platforms, key=lambda plat: plat.rect.x)
         if rightmost_platform.rect.x < WIDTH + offset_x:
             level.generate_new_platforms(rightmost_platform.rect.x + block_size, 5, block_size, HEIGHT)
+            level.generate_spikes(rightmost_platform.rect.x, 1, block_size, HEIGHT)  # Adjust the number of spikes as needed
 
 
         objects = level.platforms + [fire]
         
         player.loop(FPS)
         fire.loop()
-        handle_move(player, objects)
+        handle_move(player, objects, respawn_point)
         draw(window, background, bg_image, player, objects, offset_x)
 
         #if player falls off of the map, the player will respawn at the starting point
