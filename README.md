@@ -10,9 +10,10 @@ Python Platformer is a 2D platformer game that provides a classical, Super-Mario
 
 We have a Player class, a Level class, and Enemy Class, and an Object class which contains 3 objects: Fire, Block, and Spike. The Player class includes methods for moving, jumping, taking damage, determining if head has hit something, determining if the player has landed, and drawing the player sprite, and animating the player sprite. It includes fields which keep track of actions the player performs. The Level class has methods for initializing the level, generating platforms, and generating spikes. It contains fields for the platforms. The Object class has methods for initializing and drawing objects. The Object class has fields for keeping track of dimensions (width and height), name of object, image to use for object, and how to draw object. Block is of type object and has a method to initialize the object and fields to mask the object. Fire is of type object and contains methods to initialize, animate, and turn the object on or off. Fire contains fields which keep track of dimensions and useful variables for animation. Spike is of type object and contains methods to initialize the object and to load the image for the spike, and fields to mask the object. The Enemy class has not yet been implemented, but has been added to the diagram for an idea of what will need to be implemented. It contains methods for making enemies move, jump, and updating/animating the sprites. It contains fields for sprite and to mask the object.
 
-# Sequence Diagram
+# Sequence Diagrams
 ![Python Platformer](https://github.com/cis3296f23/project-03-pythonplatformer/assets/111991851/6a489f3b-489b-4bf9-b902-cebe15294be4)
 
+<img width="751" alt="Screenshot 2023-12-01 at 11 39 54 AM" src="https://github.com/cis3296f23/project-03-pythonplatformer/assets/90412421/caeb8c71-c56e-48c9-9432-9adde358dbc8">
 
 
 
