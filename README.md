@@ -5,7 +5,8 @@ Python Platformer is a 2D platformer game that provides a classical, Super-Mario
 <img width="997" alt="Screenshot 2023-11-10 at 9 46 36 AM" src="https://github.com/cis3296f23/project-03-pythonplatformer/assets/90412421/fd3bebbb-aff8-4fd9-bfa6-0c1aaef8179f">
 
 # UML Diagram
-![image](https://github.com/cis3296f23/project-03-pythonplatformer/assets/111991851/a04a7858-54fe-41ad-ae9c-7931e1cd405e)
+![Python Platformer drawio (2)](https://github.com/cis3296f23/project-03-pythonplatformer/assets/111991851/f95d3487-721a-4222-b719-976273abe95f)
+
 
 So far we have a Player Class, and an Object class which contains 2 objects: Fire and Block. The Player class includes methods for moving, jumping, taking damage, determining if head has hit something, determining if the player has landed, and drawing the player sprite, and animating the player sprite. It includes fields which keep track of actions the player performs. The Object class has methods for initializing and drawing objects. The Object class has fields for keeping track of dimensions (width and height), name of object, image to use for object, and how to draw object. Block is of type object and has a method to initialize the object and fields to mask the object. Fire is of type object and contains methods to initialize, animate, and turn the object on or off. Fire contains fields which keep track of dimensions and useful variables for animation.
 
