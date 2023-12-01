@@ -6,6 +6,7 @@ import button
 import pygame
 from os import listdir
 from os.path import isfile, join
+
 pygame.init()
 
 pygame.display.set_caption("Platformer")
@@ -15,6 +16,23 @@ FPS = 60
 PLAYER_VEL = 5
 
 window = pygame.display.set_mode((WIDTH, HEIGHT))
+
+# Define fonts
+font = pygame.font.SysFont("arialblack", 40)
+
+# Define colors
+TEXT_COL = (255, 255, 255)
+
+# Load button images
+resume_img = pygame.image.load("assets/images/button_resume.png").convert_alpha()
+
+# Create Button instances
+resume_button = button.Button(304, 125, resume_img, 1)
+
+
+def draw_text(text, font, text_col, x, y):
+    img = font.render(text, True, text_col)
+    window.blit(img, (x, y))
 
 
 def flip(sprites):
@@ -70,7 +88,7 @@ class Level:
 class Player(pygame.sprite.Sprite):
     COLOR = (255, 0, 0)
     GRAVITY = 1
-    SPRITES = load_sprite_sheets("MainCharacters", "MaskDude", 32, 32, True)
+    SPRITES = load_sprite_sheets("MainCharacters", "PinkMan", 32, 32, True)
     ANIMATION_DELAY = 3
 
     def __init__(self, x, y, width, height):
@@ -86,7 +104,7 @@ class Player(pygame.sprite.Sprite):
         self.hit = False
         self.hit_count = 0
 
-    #function for player respawn
+    # function for player respawn
     def respawn(self, x, y):
         self.rect.x = x
         self.rect.y = y
@@ -300,17 +318,22 @@ def handle_move(player, objects):
 
 
 def main(window):
+    # Game variables
+    game_paused = False
+
     clock = pygame.time.Clock()
     background, bg_image = get_background("cityBackground3.png")
-    
 
     block_size = 96
 
     player = Player(100, 100, 50, 50)
     fire = Fire(100, HEIGHT - block_size - 64, 16, 32)
     fire.on()
+
+
     floor = [Block(i * block_size, HEIGHT - block_size, block_size)
              for i in range(-WIDTH // block_size, (WIDTH * 2) // block_size)]
+
     objects = [*floor, Block(0, HEIGHT - block_size * 2, block_size),
                Block(block_size * 3, HEIGHT - block_size * 4, block_size), fire]
 
@@ -318,44 +341,60 @@ def main(window):
     level = Level()
     level.generate_new_platforms(-WIDTH // block_size, 20, block_size, HEIGHT)
 
-    #sets spawn point for if player falls off the map
+    # sets spawn point for if player falls off the map
     respawn_point = (100, 100)
 
     offset_x = 0
     scroll_area_width = 200
 
+
+
     run = True
     while run:
+
         clock.tick(FPS)
+
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
                 break
-            
-            #updated to jump with up arrow Or spacebar because using spacebar is weird
+
+
+            # Pause menu
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:
+                    game_paused = True
+                    print("Game paused")
+
+            # updated to jump with up arrow Or spacebar because using spacebar is weird
             if event.type == pygame.KEYDOWN:
                 if (event.key == pygame.K_SPACE or event.key == pygame.K_UP) and player.jump_count < 2:
                     player.jump()
 
-        #while in this loop, the platforms will continue to generate as long
-        #as the player continues to head left
+        # while in this loop, the platforms will continue to generate as long
+        # as the player continues to head left
         rightmost_platform = max(level.platforms, key=lambda plat: plat.rect.x)
         if rightmost_platform.rect.x < WIDTH + offset_x:
             level.generate_new_platforms(rightmost_platform.rect.x + block_size, 5, block_size, HEIGHT)
 
-
         objects = level.platforms + [fire]
-        
+
         player.loop(FPS)
         fire.loop()
         handle_move(player, objects)
         draw(window, background, bg_image, player, objects, offset_x)
 
-        #if player falls off of the map, the player will respawn at the starting point
-        if player.rect.y > HEIGHT:  
+        # Check if game is paused
+        if game_paused:
+            resume_button.draw(window)
+        else:
+            draw_text("Press SPACE to pause", font, TEXT_COL, 160, 250)
+
+        # if player falls off of the map, the player will respawn at the starting point
+        if player.rect.y > HEIGHT:
             player.respawn(*respawn_point)
-            
 
         if ((player.rect.right - offset_x >= WIDTH - scroll_area_width) and player.x_vel > 0) or (
                 (player.rect.left - offset_x <= scroll_area_width) and player.x_vel < 0):
