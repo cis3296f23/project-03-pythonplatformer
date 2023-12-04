@@ -322,7 +322,7 @@ def main(window):
     game_paused = False
 
     clock = pygame.time.Clock()
-    background, bg_image = get_background("cityBackground3.png")
+    background, bg_image = get_background("cityBackground5.png")
 
     block_size = 96
 
