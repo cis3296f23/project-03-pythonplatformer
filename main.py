@@ -6,6 +6,7 @@ import button
 import pygame
 from os import listdir
 from os.path import isfile, join
+from time import sleep
 
 pygame.init()
 
@@ -25,9 +26,14 @@ TEXT_COL = (255, 255, 255)
 
 # Load button images
 resume_img = pygame.image.load("assets/images/button_resume.png").convert_alpha()
+quit_img = pygame.image.load("assets/images/button_quit.png").convert_alpha()
+#levels_img = pygame.image.load("assets/images/button_levels.png").convert_alpha()
 
 # Create Button instances
-resume_button = button.Button(304, 125, resume_img, 1)
+resume_button = button.Button(364, 100, resume_img, 1)
+quit_button = button.Button(396, 300, quit_img, 1)
+#levels_button = button.Button(297, 250, levels_img, 1)
+
 
 
 def draw_text(text, font, text_col, x, y):
@@ -73,7 +79,7 @@ def get_block(size):
     return pygame.transform.scale2x(surface)
 
 
-# class is for infinitelty generating the map
+# class is for infinitely generating the map
 class Level:
     def __init__(self):
         self.platforms = []
@@ -318,8 +324,11 @@ def handle_move(player, objects):
 
 
 def main(window):
+
+
     # Game variables
     game_paused = False
+    menu_state = "main"
 
     clock = pygame.time.Clock()
     background, bg_image = get_background("cityBackground5.png")
@@ -329,7 +338,6 @@ def main(window):
     player = Player(100, 100, 50, 50)
     fire = Fire(100, HEIGHT - block_size - 64, 16, 32)
     fire.on()
-
 
     floor = [Block(i * block_size, HEIGHT - block_size, block_size)
              for i in range(-WIDTH // block_size, (WIDTH * 2) // block_size)]
@@ -347,12 +355,24 @@ def main(window):
     offset_x = 0
     scroll_area_width = 200
 
-
-
     run = True
     while run:
 
         clock.tick(FPS)
+
+
+        # Check if game is paused
+        if game_paused:
+            if menu_state == "main":
+                # draw pause screen buttons
+                if resume_button.draw(window):
+                    game_paused = False
+                # if levels_button.draw(window):
+                #     menu_state = "levels"
+                if quit_button.draw(window):
+                    run = False
+        else:
+            draw_text("Press P to pause", font, TEXT_COL, 300, 100)
 
 
 
@@ -361,17 +381,28 @@ def main(window):
                 run = False
                 break
 
-
             # Pause menu
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
                     game_paused = True
-                    print("Game paused")
+                    window.fill((255, 255, 255))
+            if event.type == pygame.QUIT:
+                run = False
 
             # updated to jump with up arrow Or spacebar because using spacebar is weird
             if event.type == pygame.KEYDOWN:
                 if (event.key == pygame.K_SPACE or event.key == pygame.K_UP) and player.jump_count < 2:
                     player.jump()
+
+
+        pygame.display.update()
+
+
+
+
+
+
+
 
         # while in this loop, the platforms will continue to generate as long
         # as the player continues to head left
@@ -386,12 +417,6 @@ def main(window):
         handle_move(player, objects)
         draw(window, background, bg_image, player, objects, offset_x)
 
-        # Check if game is paused
-        if game_paused:
-            resume_button.draw(window)
-        else:
-            draw_text("Press SPACE to pause", font, TEXT_COL, 160, 250)
-
         # if player falls off of the map, the player will respawn at the starting point
         if player.rect.y > HEIGHT:
             player.respawn(*respawn_point)
@@ -399,6 +424,8 @@ def main(window):
         if ((player.rect.right - offset_x >= WIDTH - scroll_area_width) and player.x_vel > 0) or (
                 (player.rect.left - offset_x <= scroll_area_width) and player.x_vel < 0):
             offset_x += player.x_vel
+
+
 
     pygame.quit()
     quit()
