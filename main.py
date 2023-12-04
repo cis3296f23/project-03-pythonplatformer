@@ -88,7 +88,7 @@ class Level:
 class Player(pygame.sprite.Sprite):
     COLOR = (255, 0, 0)
     GRAVITY = 1
-    SPRITES = load_sprite_sheets("MainCharacters", "PinkMan", 32, 32, True)
+    SPRITES = load_sprite_sheets("MainCharacters", "HooterTheOwl", 32, 32, True)
     ANIMATION_DELAY = 3
 
     def __init__(self, x, y, width, height):
