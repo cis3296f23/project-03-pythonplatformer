@@ -2,9 +2,12 @@ import os
 import sys
 import random
 import math
+import button
 import pygame
 from os import listdir
 from os.path import isfile, join
+from time import sleep
+
 pygame.init()
 
 pygame.display.set_caption("Platformer")
@@ -14,6 +17,28 @@ FPS = 60
 PLAYER_VEL = 5
 
 window = pygame.display.set_mode((WIDTH, HEIGHT))
+
+# Define fonts
+font = pygame.font.SysFont("arialblack", 40)
+
+# Define colors
+TEXT_COL = (255, 255, 255)
+
+# Load button images
+resume_img = pygame.image.load("assets/images/button_resume.png").convert_alpha()
+quit_img = pygame.image.load("assets/images/button_quit.png").convert_alpha()
+#levels_img = pygame.image.load("assets/images/button_levels.png").convert_alpha()
+
+# Create Button instances
+resume_button = button.Button(364, 100, resume_img, 1)
+quit_button = button.Button(396, 300, quit_img, 1)
+#levels_button = button.Button(297, 250, levels_img, 1)
+
+
+
+def draw_text(text, font, text_col, x, y):
+    img = font.render(text, True, text_col)
+    window.blit(img, (x, y))
 
 
 def flip(sprites):
@@ -54,7 +79,7 @@ def get_block(size):
     return pygame.transform.scale2x(surface)
 
 
-# class is for infinitelty generating the map
+# class is for infinitely generating the map
 class Level:
     def __init__(self):
         self.platforms = []
@@ -76,7 +101,7 @@ class Level:
 class Player(pygame.sprite.Sprite):
     COLOR = (255, 0, 0)
     GRAVITY = 1
-    SPRITES = load_sprite_sheets("MainCharacters", "MaskDude", 32, 32, True)
+    SPRITES = load_sprite_sheets("MainCharacters", "HooterTheOwl", 32, 32, True)
     ANIMATION_DELAY = 3
 
     def __init__(self, x, y, width, height):
@@ -92,7 +117,7 @@ class Player(pygame.sprite.Sprite):
         self.hit = False
         self.hit_count = 0
 
-    #function for player respawn
+    # function for player respawn
     def respawn(self, x, y):
         self.rect.x = x
         self.rect.y = y
@@ -367,9 +392,14 @@ class Spike(Object):
 
 
 def main(window):
+
+
+    # Game variables
+    game_paused = False
+    menu_state = "main"
+
     clock = pygame.time.Clock()
-    background, bg_image = get_background("cityBackground3.png")
-    
+    background, bg_image = get_background("cityBackground5.png")
 
     block_size = 96
 
@@ -377,8 +407,10 @@ def main(window):
     enemy = Enemy(200, 200, 50, 50)
     fire = Fire(100, HEIGHT - block_size - 64, 16, 32)
     fire.on()
+
     floor = [Block(i * block_size, HEIGHT - block_size, block_size)
              for i in range(-WIDTH // block_size, (WIDTH * 2) // block_size)]
+
     objects = [*floor, Block(0, HEIGHT - block_size * 2, block_size),
                Block(block_size * 3, HEIGHT - block_size * 4, block_size), fire]
 
@@ -386,7 +418,7 @@ def main(window):
     level = Level()
     level.generate_new_platforms(-WIDTH // block_size, 20, block_size, HEIGHT)
 
-    #sets spawn point for if player falls off the map
+    # sets spawn point for if player falls off the map
     respawn_point = (100, 100)
 
     offset_x = 0
@@ -394,41 +426,76 @@ def main(window):
 
     run = True
     while run:
+
         clock.tick(FPS)
+
+
+        # Check if game is paused
+        if game_paused:
+            if menu_state == "main":
+                # draw pause screen buttons
+                if resume_button.draw(window):
+                    game_paused = False
+                # if levels_button.draw(window):
+                #     menu_state = "levels"
+                if quit_button.draw(window):
+                    run = False
+        else:
+            draw_text("Press P to pause", font, TEXT_COL, 300, 100)
+
+
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
                 break
-            
-            #updated to jump with up arrow Or spacebar because using spacebar is weird
+
+            # Pause menu
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:
+                    game_paused = True
+                    window.fill((255, 255, 255))
+            if event.type == pygame.QUIT:
+                run = False
+
+            # updated to jump with up arrow Or spacebar because using spacebar is weird
             if event.type == pygame.KEYDOWN:
                 if (event.key == pygame.K_SPACE or event.key == pygame.K_UP) and player.jump_count < 2:
                     player.jump()
 
-        #while in this loop, the platforms will continue to generate as long
-        #as the player continues to head left
+
+        pygame.display.update()
+
+
+
+
+
+
+
+
+        # while in this loop, the platforms will continue to generate as long
+        # as the player continues to head left
         rightmost_platform = max(level.platforms, key=lambda plat: plat.rect.x)
         if rightmost_platform.rect.x < WIDTH + offset_x:
             level.generate_new_platforms(rightmost_platform.rect.x + block_size, 5, block_size, HEIGHT)
             level.generate_spikes(rightmost_platform.rect.x, 1, block_size, HEIGHT)  # Adjust the number of spikes as needed
 
-
         objects = level.platforms + [fire]
-        
+
         player.loop(FPS)
         fire.loop()
         handle_move(player, objects, respawn_point)
         draw(window, background, bg_image, player, objects, offset_x)
 
-        #if player falls off of the map, the player will respawn at the starting point
-        if player.rect.y > HEIGHT:  
+        # if player falls off of the map, the player will respawn at the starting point
+        if player.rect.y > HEIGHT:
             player.respawn(*respawn_point)
-            
 
         if ((player.rect.right - offset_x >= WIDTH - scroll_area_width) and player.x_vel > 0) or (
                 (player.rect.left - offset_x <= scroll_area_width) and player.x_vel < 0):
             offset_x += player.x_vel
+
+
 
     pygame.quit()
     quit()
