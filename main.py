@@ -203,6 +203,46 @@ class Player(pygame.sprite.Sprite):
         win.blit(self.sprite, (self.rect.x - offset_x, self.rect.y))
 
 
+class Enemy(pygame.sprite.Sprite):
+    SPRITES = load_sprite_sheets("Enemies", "Skateboarder", 32, 32, True)
+    GRAVITY = 1
+    ANIMATION_DELAY = 3
+
+    def __init__(self, x, y, width, height):
+        super().__init__()
+        self.rect = pygame.Rect(x, y, width, height)
+        self.x_vel = -3
+        self.y_vel = 0
+        self.mask = None
+        self.direction = "left"
+        self.animation_count = 0
+        self.walkCount = 0
+
+    def move(self, dx, dy):
+        self.rect.x += dx
+        self.rect.y += dy
+
+    def update_sprite(self):
+        sprite_sheet = "walk"
+        if self.x_vel != 0:
+            sprite_sheet = "walk"
+
+        sprite_sheet_name = sprite_sheet + "_" + self.direction
+        sprites = self.SPRITES[sprite_sheet_name]
+        sprite_index = (self.animation_count //
+                        self.ANIMATION_DELAY) % len(sprites)
+        self.sprite = sprites[sprite_index]
+        self.animation_count += 1
+        self.update()
+
+    def update(self):
+        self.rect = self.sprite.get_rect(topleft=(self.rect.x, self.rect.y))
+        self.mask = pygame.mask.from_surface(self.sprite)
+
+    def draw(self, win, offset_x):
+        win.blit(self.sprite, (self.rect.x - offset_x, self.rect.y))
+
+
 class Object(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height, name=None):
         super().__init__()
@@ -364,6 +404,7 @@ def main(window):
     block_size = 96
 
     player = Player(100, 100, 50, 50)
+    enemy = Enemy(200, 200, 50, 50)
     fire = Fire(100, HEIGHT - block_size - 64, 16, 32)
     fire.on()
 
